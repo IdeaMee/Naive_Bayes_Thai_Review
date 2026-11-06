@@ -49,3 +49,35 @@
   - นำผลลัพธ์ที่ได้ไปสร้าง Word Cloud เพื่อแสดงภาพให้ชัดเจน
 
 ---
+
+## 4. Examples (ตัวอย่างโค้ดหรือผลลัพธ์ต้นแบบ)
+
+เพื่อให้เห็น Pattern การเขียนโค้ดที่ถูกต้องตามกฎ (มีการใช้ Type Hint, ไม่ใช้ ML Library สำเร็จรูป, และคอมเมนต์ภาษาไทย):
+
+```python
+import math
+from typing import List, Dict
+
+# ตัวอย่าง Step 3: การคำนวณ Likelihood พร้อม Type Hinting
+def calculate_likelihoods(word_counts: Dict[int, Dict[str, int]], 
+                          vocab_size: int, 
+                          classes: List[int]) -> Dict[int, Dict[str, float]]:
+    """
+    ฟังก์ชันคำนวณ Likelihood โดยใช้ Laplace Smoothing แบบเขียนเอง
+    """
+    log_likelihoods: Dict[int, Dict[str, float]] = {}
+    
+    for c in classes:
+        log_likelihoods[c] = {}
+        # นับจำนวนคำทั้งหมดที่โผล่มาในคลาส c
+        total_words_in_class = sum(word_counts[c].values())
+        
+        for word in vocab:
+            # ใช้ Laplace Smoothing: +1 ที่เศษ และ +vocab_size ที่ส่วน
+            count = word_counts[c].get(word, 0)
+            prob = (count + 1) / (total_words_in_class + vocab_size)
+            # เก็บค่าเป็น Log เพื่อป้องกัน Underflow
+            log_likelihoods[c][word] = math.log(prob)
+            
+    return log_likelihoods
+```
